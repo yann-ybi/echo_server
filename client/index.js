@@ -1,6 +1,6 @@
 const ws = new WebSocket("ws://127.0.0.1:7878")
 
-ws.addEventListener("open", function(event) {
+ws.addEventListener("open", function() {
     console.log("Sending message to server: Hello!")
     ws.send("Hello!")
 })
