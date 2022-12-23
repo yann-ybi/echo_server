@@ -1,12 +1,28 @@
 extern crate ws;
 
-fn main() {
+use std::{thread, time};
+use ws::{Handler, Sender, WebSocket};
 
-    ws::listen("127.0.0.1:7878", |out| {
-        move |msg| {
-            println!( "Received message: {}", msg);
-            out.send(msg)
-        }
-    })
-    .unwrap()
+// The factory worker from the pool sending message to the server
+struct Server {
+    out: Sender,
+}
+
+impl Handler for Server {
+    
+}
+
+fn main() {
+    let server = WebSocket::new(|out| Server { out }).unwrap();
+
+    let broadcaster = server.broadcaster();
+    
+    let periodic = thread::spawn(move || loop {
+        broadcaster.send("Hello!").unwrap();
+        thread::sleep(time::Duration::from_secs(1));
+    });
+
+    server.listen("127.0.0.1:7878").unwrap();
+
+    periodic.join().unwrap();
 }
